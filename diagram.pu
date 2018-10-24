@@ -1,0 +1,96 @@
+@startuml
+
+interface CoroutineContext{
+    public CoroutineContext plus(CoroutineContext)
+}
+
+interface Element {
+    public Key key
+}
+CoroutineContext <|.. Element
+
+class AbstractCoroutineContextElement extends Element
+
+interface ContinuationInterceptor
+
+class CoroutineDispatcher extends AbstractCoroutineContextElement{
+}
+
+ContinuationInterceptor <|.. CoroutineDispatcher
+
+class ExecutorCoroutineDispatcher extends CoroutineDispatcher{
+}
+
+class ExperimentalCoroutineDispatcher extends ExecutorCoroutineDispatcher{
+
+}
+class DefaultScheduler extends ExperimentalCoroutineDispatcher{
+}
+
+class LimitingDispatcher extends ExperimentalCoroutineDispatcher{
+}
+
+Element <|.. Job
+
+
+interface Job{
+}
+interface ChildJob{
+}
+interface ParentJob{
+}
+interface SelectClause0{
+}
+class JobSupport{
+}
+Job <|.. JobSupport
+Job <|.. ChildJob
+Job <|.. ParentJob
+ChildJob <|.. JobSupport
+ParentJob <|.. JobSupport
+SelectClause0 <|.. JobSupport
+class JobImpl extends JobSupport{
+}
+
+interface CoroutineScope
+
+class GlobalScope {
+}
+CoroutineScope <|.. GlobalScope
+
+CoroutineScope *- CoroutineContext
+
+class CombinedContext extends CoroutineContext{
+    CoroutineContext left
+    Element element
+}
+
+CombinedContext *-- CoroutineContext
+CombinedContext *- Element
+
+class AbstractCoroutine extends JobSupport{
+}
+class StandaloneCoroutine extends AbstractCoroutine{
+}
+interface Deferred
+interface SelectClause1
+
+Job <|.. AbstractCoroutine
+Continuation  <|.. AbstractCoroutine
+CoroutineScope  <|.. AbstractCoroutine
+CoroutineContext <|.. EmptyCoroutineContext
+Job <|.. Deferred
+
+class DeferredCoroutine extends AbstractCoroutine{
+}
+
+Deferred <|.. DeferredCoroutine
+SelectClause1 <|.. DeferredCoroutine
+
+note bottom of JobImpl : Job()
+note bottom of DeferredCoroutine : async{}
+note bottom of StandaloneCoroutine : launch{}
+note bottom of DefaultScheduler : Dispatchers.Default
+note bottom of LimitingDispatcher : Dispatchers.IO
+
+@enduml
